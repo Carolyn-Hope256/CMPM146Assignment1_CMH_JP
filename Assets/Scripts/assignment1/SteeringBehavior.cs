@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
+using System.Collections;
+using System;
 
 public class SteeringBehavior : MonoBehaviour
 {
@@ -10,7 +12,21 @@ public class SteeringBehavior : MonoBehaviour
     // you can use this label to show debug information,
     // like the distance to the (next) target
     public TextMeshProUGUI label;
-    
+
+    public float MaxSpeed = 10.0f;
+    public float MinSpeed = -4.0f;
+    public float Acceleration = 4f;
+    public float TurnRate = 10f;
+    public float DeltaTurnRate = 5f;
+    public float WayPointRadius = 15f;
+
+    private string state = "stopped";
+    private float speed = 0;
+    private float turnRate = 0;
+    private float heading = 0;
+    private float targetheading = 0;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -25,10 +41,132 @@ public class SteeringBehavior : MonoBehaviour
     {
         // Assignment 1: If a single target was set, move to that target
         //                If a path was set, follow that path ("tightly")
+        heading = this.transform.rotation.eulerAngles.y;
+        if (heading > 180)
+        {
+            heading -= 360;
+        }
+        else if (heading < -180)
+        {
+            heading += 360;
+        }
+
+
+
+        targetheading = Vector3.SignedAngle(new Vector3(0, 0, 1), target - transform.position, new Vector3(0, 1, 0));
+        float dif = targetheading - heading;
+        float dir = 0;
+        if (dif > 0) { 
+            dir = dif/System.Math.Abs(dif);
+        }
+
+        switch (state)
+        {
+            case "stopped":
+                if(DistanceToWaypoint(target) > WayPointRadius)
+                {
+                    state = "driving";
+                    
+                    Debug.Log("Driving to target");
+                }
+                
+                break;
+            case "driving":
+
+                speed = Tween(speed, MaxSpeed, Acceleration);
+                kinematic.SetDesiredSpeed(speed);
+                Debug.Log(speed);
+
+
+                if (System.Math.Abs(dif) > 0.1)
+                {
+                    //Debug.Log("Dif: " + dif);
+                    turnRate = Tween(turnRate, TurnRate, DeltaTurnRate);
+                    heading = Tween(heading, targetheading, turnRate * speed);
+                    transform.eulerAngles = new Vector3(0, heading, 0);
+                }
+                else
+                {
+                    turnRate = 0;
+                }
+
+                if (DistanceToWaypoint(target) < WayPointRadius)
+                {
+                    state = "arriving";
+
+                    Debug.Log("Arriving at target");
+                }
+
+                break;
+                
+
+            case "arriving":
+                speed = Tween(speed, 0, Acceleration);
+                Debug.Log(speed);
+                kinematic.SetDesiredSpeed(speed);
+                if(speed == 0)
+                {
+                    turnRate = 0;
+                    state = "stopped";
+                    break;
+                }
+
+                if (System.Math.Abs(dif) > 0.1)
+                {
+                    //Debug.Log("Dif: " + dif);
+                    turnRate = Tween(turnRate, TurnRate, DeltaTurnRate);
+                    heading = Tween(heading, targetheading, turnRate * speed);
+                    transform.eulerAngles = new Vector3(0, heading, 0);
+                }
+                else
+                {
+                    turnRate = 0;
+                }
+                break;
+
+            default:
+                break;
+        }
+            
 
         // you can use kinematic.SetDesiredSpeed(...) and kinematic.SetDesiredRotationalVelocity(...)
         //    to "request" acceleration/decceleration to a target speed/rotational velocity
     }
+
+    private float DistanceToWaypoint(Vector3 waypoint)
+    {
+        return ( (float)( System.Math.Sqrt(System.Math.Pow( (gameObject.transform.position.x - waypoint.x), 2) + System.Math.Pow( (gameObject.transform.position.z - waypoint.z), 2) )) );
+    }
+
+    private float Tween(float current, float target, float rate) {
+        float newVal = 0;
+        float dif =  target - current;
+        if (dif == 0)
+        {
+            return current;
+        }
+        
+        float dir = dif / System.Math.Abs(dif);
+        //Debug.Log("Dir: " + dir);
+
+        newVal = current + (rate * dir * Time.deltaTime);
+
+        if (newVal * dir > target * dir)
+        {
+            newVal = target;
+        }
+
+
+        return newVal;
+    }
+
+    /*private void Accelerate(float target)
+    {
+        speed = speed 
+        
+        kinematic.SetDesiredSpeed(speed);
+    }*/
+
 
     public void SetTarget(Vector3 target)
     {
@@ -46,4 +184,6 @@ public class SteeringBehavior : MonoBehaviour
         this.path = null;
         this.target = transform.position;
     }
+
 }
+

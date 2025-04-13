@@ -1069,6 +1069,12 @@ MonoBehaviour:
   kinematic: {fileID: 0}
   path: []
   label: {fileID: 200820899}
+  MaxSpeed: 10
+  MinSpeed: -4
+  Acceleration: 3
+  TurnRate: 5
+  DeltaTurnRate: 1.5
+  WayPointRadius: 3
 --- !u!114 &1006009576
 MonoBehaviour:
   m_ObjectHideFlags: 0
