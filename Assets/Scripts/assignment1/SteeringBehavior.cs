@@ -56,11 +56,12 @@ public class SteeringBehavior : MonoBehaviour
 
 
         targetheading = Vector3.SignedAngle(new Vector3(0, 0, 1), target - transform.position, new Vector3(0, 1, 0));
-        float temp = targetheading;
+
+        
         if (targetheading < 0){
-            temp += 360;
+            targetheading += 360;
         }
-        float dif = temp - heading;
+        float dif = targetheading - heading;
         float dir = 0;
         if (dif > 0) { 
             dir = dif/System.Math.Abs(dif);
@@ -90,7 +91,7 @@ public class SteeringBehavior : MonoBehaviour
                     turnRate = Tween(turnRate, TurnRate, DeltaTurnRate);
                     
                     //add rotatetween function
-                    heading = Tween(heading, targetheading, turnRate * speed);
+                    heading = RotateTween(heading, targetheading, turnRate * speed);
                     transform.eulerAngles = new Vector3(0, heading, 0);
                 }
                 else
@@ -112,7 +113,7 @@ public class SteeringBehavior : MonoBehaviour
             case "arriving":
                 //speed = Tween(speed, 0, Acceleration);
                 speed = currentspeed * DistanceToWaypoint(target)/WayPointRadius;
-                Debug.Log(speed);
+                //Debug.Log(speed);
                 kinematic.SetDesiredSpeed(speed);
                 if(speed <= currentspeed * 0.1)
                 {
@@ -129,13 +130,21 @@ public class SteeringBehavior : MonoBehaviour
                 {
                     //Debug.Log("Dif: " + dif);
                     turnRate = Tween(turnRate, TurnRate, DeltaTurnRate);
-                    heading = Tween(heading, targetheading, turnRate * speed);
+                    heading = RotateTween(heading, targetheading, turnRate * speed);
                     transform.eulerAngles = new Vector3(0, heading, 0);
                 }
                 else
                 {
                     turnRate = 0;
                 }
+
+                if (DistanceToWaypoint(target) > WayPointRadius)
+                {
+                    state = "driving";
+
+                    Debug.Log("Driving to target");
+                }
+
                 break;
 
             default:
@@ -176,18 +185,31 @@ public class SteeringBehavior : MonoBehaviour
 
     private float RotateTween(float current, float target, float rate) {
         float newVal = 0;
+
+
+        if (current > 180)
+        {
+            current -= 360;
+        }
+
+
         float dif =  target - current;
         
         if (dif == 0)
         {
             return current;
         }
+
         if (dif > 180){
+            Debug.Log(dif);
             dif -= 360;
+            target -= 360;
         }
         
         float dir = dif / System.Math.Abs(dif);
         //Debug.Log("Dir: " + dir);
+
+        Debug.Log("heading: " + current + ", target heading: " + target + ", difference: " + dif);
 
         newVal = current + (rate * dir * Time.deltaTime);
 
@@ -196,6 +218,10 @@ public class SteeringBehavior : MonoBehaviour
             newVal = target;
         }
 
+        if (newVal < 0)
+        {
+            newVal += 360;
+        }
 
         return newVal;
     }
