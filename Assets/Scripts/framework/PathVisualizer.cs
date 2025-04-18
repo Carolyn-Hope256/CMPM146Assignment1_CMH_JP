@@ -29,7 +29,8 @@ public class PathVisualizer : MonoBehaviour
         }
         line.positionCount = path.Count + 1;
         List<Vector3> vertices = new List<Vector3>(path);
-        vertices.Insert(0, origin.transform.position);
+        SteeringBehavior nav = origin.GetComponent<SteeringBehavior>();
+        vertices.Insert(0, nav.target);
         line.SetPositions(vertices.ToArray());
     }
 
