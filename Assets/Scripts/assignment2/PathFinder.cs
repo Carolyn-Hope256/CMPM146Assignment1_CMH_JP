@@ -71,8 +71,8 @@ public class PathFinder : MonoBehaviour
             priorityQueue.RemoveAt(0);
             exploredList.Add(firstelement);
             var neighbours = firstelement.return_node().GetNeighbors();
-            
-            print(neighbours.Count);
+
+
             for (var i = 0; i < neighbours.Count; i++){
                 
                 
@@ -85,7 +85,9 @@ public class PathFinder : MonoBehaviour
                     firstelement,
                     neighbours[i].GetWall()
                 );
-                
+                //Debug.Log("jsbfilgha");
+                //Debug.Log(newEntry.return_cost() + "," + newEntry.return_heuristic());
+
                 //check if entry is already in exploredList
                 var needToBreak = false;
                 for(var j = 0; j < exploredList.Count;j++){
@@ -115,35 +117,8 @@ public class PathFinder : MonoBehaviour
                     }
                 }
                 if (needToBreak){
-                    break;
+                    continue;
                 }
-
-
-                //if entry isnt in list
-                //put entry into list
-                // var index = 0;
-                // while (true){
-                //     if(index >= priorityQueue.Count){
-                //         priorityQueue.Insert(index,newEntry);
-                //         break;
-                //     }
-                //     //check if new entry is larger than the entry in list
-                //     if(newEntry.return_total_cost() <= priorityQueue[index].return_total_cost()){
-                //         if (Math.Abs(newEntry.return_total_cost() - priorityQueue[index].return_total_cost()) <=  0.1){
-                //             if (newEntry.return_heuristic() < priorityQueue[index].return_heuristic()){
-                //                 priorityQueue.Insert(index,newEntry);
-                //             }else{
-                //                 Debug.Log("whoops!");
-                //                 priorityQueue.Insert(index + 1,newEntry);
-                //             }
-                //         }else{
-                //             priorityQueue.Insert(index,newEntry);
-                //         }
-                //         break;
-                //     }
-                //     index += 1;
-                //     Debug.Log("sortloop");
-                // }
 
                 var hasPut = false;
                 for (var ind = 0; ind < priorityQueue.Count; ind++){
