@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using NUnit.Framework.Internal.Commands;
 using Unity.VisualScripting.FullSerializer;
 using System;
+using UnityEngine.Rendering;
 public class AStarEntry
 {
 
@@ -31,6 +32,12 @@ public class AStarEntry
     public GraphNode return_node(){
         return this.node;
     }
+    public AStarEntry return_previous(){
+        return this.previousEntry;
+    }
+    public Wall return_wall(){
+        return this.wallTraversed;
+    }
 }
 public class PathFinder : MonoBehaviour
 {
@@ -56,15 +63,15 @@ public class PathFinder : MonoBehaviour
         List<AStarEntry> exploredList = new List<AStarEntry>(){ };
         // return path and number of nodes expanded
         //Debug.Log(priorityQueue[0].return_node().GetID());
-        var counter = 4;
+        // var counter = 4;
         while (priorityQueue.Count != 0 && priorityQueue[0].return_node().GetID() != destination.GetID()){
             
-            counter --;
-            if (counter <= 0){
-                Debug.Log(priorityQueue[0].return_node().GetID());
-                Debug.Log("force stopped");
-                break;
-            }
+            // counter --;
+            // if (counter <= 0){
+            //     Debug.Log(priorityQueue[0].return_node().GetID());
+            //     Debug.Log("force stopped");
+            //     break;
+            // }
             
             //expand first element
             var firstelement = priorityQueue[0];
@@ -150,18 +157,36 @@ public class PathFinder : MonoBehaviour
                 {
                     priorityQueue.Add(newEntry);
                 }
-                Debug.Log("printing all");
-                for (var x = 0; x < priorityQueue.Count; x++){
-                    Debug.Log(priorityQueue[x].return_cost() + "," + priorityQueue[x].return_heuristic());
-                }
+                // Debug.Log("printing all");
+                // for (var x = 0; x < priorityQueue.Count; x++){
+                //     Debug.Log(priorityQueue[x].return_cost() + "," + priorityQueue[x].return_heuristic());
+                // }
                 
             }
             //first item is destination now
             
         }
-        Debug.Log("found item!");
+        //Debug.Log("found item!");
+        // counter = 100;
+        var currentEntry = priorityQueue[0];
+        path.Insert(0,target);
+        while (true){
+            
+            // counter--;
+            // if (counter <= 0){
+            //     //Debug.Log("force stop");
+            //     break;
+            // }
+            if (currentEntry.return_wall() == null){
+                break;
+            }
+            path.Insert(0,currentEntry.return_wall().midpoint);
+
+            currentEntry = currentEntry.return_previous();
+
+        }
         
-        return (path, 0);
+        return (path, exploredList.Count);
 
     }
 

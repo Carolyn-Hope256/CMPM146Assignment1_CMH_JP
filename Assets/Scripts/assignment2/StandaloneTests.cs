@@ -10,12 +10,12 @@ public class StandaloneTests : MonoBehaviour
         var maps = new TestCase();
 
         graph = maps.MakeTestCase();
-        //RunTest(0, 8, 87.97f);
-        //RunTest(8, 0, 87.97f);
-        //RunTest(2, 9, 79.81f);
-        //RunTest(9, 2, 79.81f);
-        //RunTest(1, 10, 114.92f);
-        //RunTest(10, 1, 114.92f);
+        RunTest(0, 8, 87.97f);
+        RunTest(8, 0, 87.97f);
+        RunTest(2, 9, 79.81f);
+        RunTest(9, 2, 79.81f);
+        RunTest(1, 10, 114.92f);
+        RunTest(10, 1, 114.92f);
 
     }
 
