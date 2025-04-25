@@ -50,7 +50,7 @@ public class SteeringBehavior : MonoBehaviour
         heading = this.transform.rotation.eulerAngles.y;
         
         float roundedspeed = (float)System.Math.Round(kinematic.speed, 2);
-        Speedometer.text =  roundedspeed + " m/s";
+        //Speedometer.text =  roundedspeed + " m/s";
 
 
         targetheading = Vector3.SignedAngle(new Vector3(0, 0, 1), target - transform.position, new Vector3(0, 1, 0));
@@ -179,7 +179,7 @@ public class SteeringBehavior : MonoBehaviour
                 break;
             
         }
-        Debug.Log(state);    
+        //Debug.Log(state);    
 
         // you can use kinematic.SetDesiredSpeed(...) and kinematic.SetDesiredRotationalVelocity(...)
         //    to "request" acceleration/decceleration to a target speed/rotational velocity

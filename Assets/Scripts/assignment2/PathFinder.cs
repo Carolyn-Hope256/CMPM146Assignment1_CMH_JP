@@ -55,7 +55,13 @@ public class PathFinder : MonoBehaviour
         List<AStarEntry> priorityQueue = new List<AStarEntry>(){ startEntry };
         // return path and number of nodes expanded
         Debug.Log(priorityQueue[0].return_node().GetID());
+        var counter = 100;
         while (priorityQueue[0].return_node().GetID() != destination.GetID()){
+            counter --;
+            if (counter <= 0){
+                Debug.Log("force stopped");
+                break;
+            }
             //expand first element
             var firstelement = priorityQueue[0];
             var neighbours = firstelement.return_node().GetNeighbors();
@@ -92,29 +98,29 @@ public class PathFinder : MonoBehaviour
                 }
                 //if entry isnt in list
                 //put entry into list
-                var index = 0;
-                while (true){
-                    if(index >= priorityQueue.Count){
-                        priorityQueue.Insert(index,newEntry);
-                        break;
-                    }
-                    //check if new entry is larger than the entry in list
-                    if(newEntry.return_total_cost() <= priorityQueue[index].return_total_cost()){
-                        if (Math.Abs(newEntry.return_total_cost() - priorityQueue[index].return_total_cost()) <=  0.1){
-                            if (newEntry.return_heuristic() < priorityQueue[index].return_heuristic()){
-                                priorityQueue.Insert(index,newEntry);
-                            }else{
-                                Debug.Log("whoops!");
-                                priorityQueue.Insert(index + 1,newEntry);
-                            }
-                        }else{
-                            priorityQueue.Insert(index,newEntry);
-                        }
-                        break;
-                    }
-                    index += 1;
-                    Debug.Log("sortloop");
-                }
+                // var index = 0;
+                // while (true){
+                //     if(index >= priorityQueue.Count){
+                //         priorityQueue.Insert(index,newEntry);
+                //         break;
+                //     }
+                //     //check if new entry is larger than the entry in list
+                //     if(newEntry.return_total_cost() <= priorityQueue[index].return_total_cost()){
+                //         if (Math.Abs(newEntry.return_total_cost() - priorityQueue[index].return_total_cost()) <=  0.1){
+                //             if (newEntry.return_heuristic() < priorityQueue[index].return_heuristic()){
+                //                 priorityQueue.Insert(index,newEntry);
+                //             }else{
+                //                 Debug.Log("whoops!");
+                //                 priorityQueue.Insert(index + 1,newEntry);
+                //             }
+                //         }else{
+                //             priorityQueue.Insert(index,newEntry);
+                //         }
+                //         break;
+                //     }
+                //     index += 1;
+                //     Debug.Log("sortloop");
+                // }
                 var hasPut = false;
                 for (var ind = 0; ind < priorityQueue.Count; ind++){
                     
@@ -124,13 +130,13 @@ public class PathFinder : MonoBehaviour
                             //they are equal
                             if (newEntry.return_heuristic() < priorityQueue[ind].return_heuristic()){
                                 //newentry has more valuable heuristic
-                                priorityQueue.Insert(index,newEntry);
+                                priorityQueue.Insert(ind,newEntry);
                                 hasPut = true;
                                 break;
                             }
                             //else dont break, check next element
                         }else{
-                            priorityQueue.Insert(index,newEntry);
+                            priorityQueue.Insert(ind,newEntry);
                             hasPut = true;
                             break;
                         }
@@ -143,11 +149,11 @@ public class PathFinder : MonoBehaviour
 
                 
             }
-            //first item is target!
+            //first item is destination now
             
         }
         Debug.Log("found item!");
-
+        Debug.Log(priorityQueue.Count);
         return (path, 0);
 
     }
