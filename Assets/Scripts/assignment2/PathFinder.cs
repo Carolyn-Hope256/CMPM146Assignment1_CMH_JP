@@ -168,6 +168,9 @@ public class PathFinder : MonoBehaviour
         }
         //Debug.Log("found item!");
         // counter = 100;
+        if(priorityQueue.Count == 0){
+            return (null,-1);
+        }
         var currentEntry = priorityQueue[0];
         path.Insert(0,target);
         while (true){
