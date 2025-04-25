@@ -47,27 +47,34 @@ public class PathFinder : MonoBehaviour
     // Take a look at StandaloneTests.cs for some test cases
     public static (List<Vector3>, int) AStar(GraphNode start, GraphNode destination, Vector3 target)
     {
-        Debug.Log(start.GetID());
-        Debug.Log(destination.GetID());
+
         // Implement A* here
         List<Vector3> path = new List<Vector3>() {};
+
         var startEntry = new AStarEntry(start,0,get_distance(start.GetCenter(),destination.GetCenter()),null,null);
         List<AStarEntry> priorityQueue = new List<AStarEntry>(){ startEntry };
+        List<AStarEntry> exploredList = new List<AStarEntry>(){ };
         // return path and number of nodes expanded
-        Debug.Log(priorityQueue[0].return_node().GetID());
-        var counter = 100;
-        while (priorityQueue[0].return_node().GetID() != destination.GetID()){
+        //Debug.Log(priorityQueue[0].return_node().GetID());
+        var counter = 4;
+        while (priorityQueue.Count != 0 && priorityQueue[0].return_node().GetID() != destination.GetID()){
+            
             counter --;
             if (counter <= 0){
+                Debug.Log(priorityQueue[0].return_node().GetID());
                 Debug.Log("force stopped");
                 break;
             }
+            
             //expand first element
             var firstelement = priorityQueue[0];
+            priorityQueue.RemoveAt(0);
+            exploredList.Add(firstelement);
             var neighbours = firstelement.return_node().GetNeighbors();
+            
+            print(neighbours.Count);
             for (var i = 0; i < neighbours.Count; i++){
-                Debug.Log("mainloop");
-
+                
                 
                 //create AStarEntry
                 var newnode = neighbours[i].GetNode();
@@ -77,9 +84,23 @@ public class PathFinder : MonoBehaviour
                     get_distance(newnode.GetCenter(),destination.GetCenter()),
                     firstelement,
                     neighbours[i].GetWall()
-                    );
-                //check if entry is already in list
+                );
+                
+                //check if entry is already in exploredList
                 var needToBreak = false;
+                for(var j = 0; j < exploredList.Count;j++){
+                    if (exploredList[j].return_node().GetID() == newEntry.return_node().GetID()){
+                        //if the new entry is more valuable, kick the old entry out and reinser the new one
+                        if (newEntry.return_total_cost() < exploredList[j].return_total_cost()){
+                            exploredList[j] = newEntry;
+                            needToBreak = false;
+                        }
+                        else{
+                            needToBreak = true;
+                        }
+                        break;
+                    }
+                }
                 for(var j = 0; j < priorityQueue.Count;j++){
                     if (priorityQueue[j].return_node().GetID() == newEntry.return_node().GetID()){
                         //if the new entry is more valuable, kick the old entry out and reinser the new one
@@ -96,6 +117,8 @@ public class PathFinder : MonoBehaviour
                 if (needToBreak){
                     break;
                 }
+
+
                 //if entry isnt in list
                 //put entry into list
                 // var index = 0;
@@ -121,39 +144,48 @@ public class PathFinder : MonoBehaviour
                 //     index += 1;
                 //     Debug.Log("sortloop");
                 // }
+
                 var hasPut = false;
                 for (var ind = 0; ind < priorityQueue.Count; ind++){
-                    
-                    if(newEntry.return_total_cost() <= priorityQueue[ind].return_total_cost()){
-                        //it newentry more valuable or equal
-                        if (Math.Abs(newEntry.return_total_cost() - priorityQueue[ind].return_total_cost()) <=  0.1){
+                    //check if they are really close
+                    if(newEntry.return_total_cost() < priorityQueue[ind].return_total_cost()){
+                        //it newentry more valuable
+                        priorityQueue.Insert(ind,newEntry);
+                        hasPut = true;
+                        break;
+                    }
+                    //Debug.Log(newEntry.return_total_cost() + " vs " + priorityQueue[ind].return_total_cost());
+                    if (Math.Abs(newEntry.return_total_cost() - priorityQueue[ind].return_total_cost()) <=  0.1){
                             //they are equal
                             if (newEntry.return_heuristic() < priorityQueue[ind].return_heuristic()){
-                                //newentry has more valuable heuristic
+                                //newentry has more valuable heuristic\
+                                //Debug.Log(newEntry.return_heuristic() + " vs " + priorityQueue[ind].return_heuristic());
                                 priorityQueue.Insert(ind,newEntry);
                                 hasPut = true;
                                 break;
+                            }else{
+                                continue;
                             }
-                            //else dont break, check next element
-                        }else{
-                            priorityQueue.Insert(ind,newEntry);
-                            hasPut = true;
-                            break;
-                        }
                     }
+
+                    
                 }
+                
                 if (hasPut == false)
                 {
                     priorityQueue.Add(newEntry);
                 }
-
+                Debug.Log("printing all");
+                for (var x = 0; x < priorityQueue.Count; x++){
+                    Debug.Log(priorityQueue[x].return_cost() + "," + priorityQueue[x].return_heuristic());
+                }
                 
             }
             //first item is destination now
             
         }
         Debug.Log("found item!");
-        Debug.Log(priorityQueue.Count);
+        
         return (path, 0);
 
     }
