@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class GraphVisualizer : MonoBehaviour
 {
@@ -17,15 +18,22 @@ public class GraphVisualizer : MonoBehaviour
         visualizers.Clear();
     }
 
-    void Show()
+    async void Show()
     {
         foreach (var n in graph.all_nodes)
         {
-            GameObject nv = Instantiate(NodeVisualizer, Vector3.zero, Quaternion.identity);
-            GraphNodeVisualizer gnv = nv.GetComponent<GraphNodeVisualizer>();
-            gnv.SetGraphNode(n);
-            visualizers.Add(nv);
+            DrawNode(n);
+            await Task.Delay(2000);
+            //Task.Delay(2000).ContinueWith(t => DrawNode(n));
         }
+    }
+
+    void DrawNode(GraphNode n)
+    {
+        GameObject nv = Instantiate(NodeVisualizer, Vector3.zero, Quaternion.identity);
+        GraphNodeVisualizer gnv = nv.GetComponent<GraphNodeVisualizer>();
+        gnv.SetGraphNode(n);
+        visualizers.Add(nv);
     }
 
     public void ShowGraph(Graph g)

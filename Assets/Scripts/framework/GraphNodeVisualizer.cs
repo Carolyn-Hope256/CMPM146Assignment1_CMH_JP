@@ -15,6 +15,7 @@ public class GraphNodeVisualizer : MonoBehaviour
         {
             vertices.Add(w.start);
         }
+        Debug.Log(vertices.Count);
         vertices.Add(vertices[0]);
         
         polygon.SetPositions(vertices.ToArray());
